@@ -1,2 +1,10 @@
 niveaux de difficulté:
   -inteface pour gérer les stratégies à prendre en compte selon la difficulté
+Stratégies:
+  -coefficienter les stratégie pour un choix optimal (classement des stratégie)
+  -si pas de carte intéressante choisir la carte du haut 
+  -début de partie choisir la carte avec le plus de couronne
+  -choix de carte pour bloquer les adversaires
+  -optimiser la pose des cartes pour centrer le chateau
+  -si deja une carte avec des couronnes sur plateau choisir des cartes pour augmenter son potentiel de point
+  -
