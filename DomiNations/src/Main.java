@@ -41,17 +41,25 @@ class Plateau {
 		Domino.removeDominos(nbRemove);
 
 		Players.createPlayers(); // explicit
-		Players.givePlayersKings(); // explicit
+		Players.givePlayersKings(); // explicit		
 
+		firstTurn();
+	}
+
+	private static void firstTurn() {
 		// gives a random order for players
 		Players.shuffleKings();
-
+		
 		Domino.nextDominos(); // first domino line
-
+		
+		for (Players player : Players.allPlayers) {
+			// choose his next domino
+			player.playerDominos.add(Domino.chooseDomino(player));
+		}
+		
 		// copy playable into current
 		Domino.currentDominos.addAll(Domino.playableDominos);
-
-		// TODO first turn to select first dominos
+		
 		nextTurn();
 	}
 
@@ -60,9 +68,11 @@ class Plateau {
 		int[] coordinates = new int[2];
 
 		// clears the next order of players
-		Players.newOrder.clear();
+		Players.newOrder.replaceAll(e -> null);
 		// new domino line
 		Domino.nextDominos();
+		
+		//TODO play while still have kings
 
 		// TO SEE WORKING PROTOTYPE, ADD MULTI LINE COMMENT: /*
 
@@ -71,7 +81,7 @@ class Plateau {
 			coordinates = Domino.chooseCoordinates();
 			orientation = Domino.chooseOrientation();
 
-			// ERROR i know it's normal I don't have user input yet
+			//TODO place again if not correct
 			Domino.placeDomino(player.playerDominos.get(0), player.playerPlateau, coordinates[0], coordinates[1],
 					orientation);
 			// remove the placed domino
@@ -81,9 +91,11 @@ class Plateau {
 			player.playerDominos.add(Domino.chooseDomino(player));
 		}
 
-		// clears current then copy playable into it
-		Domino.currentDominos.clear();
-		Domino.currentDominos.addAll(Domino.playableDominos);
+		//currentDominos deleted in placeDomino
+		//added in chooseDomino then sorted
+		//slight issue that will be fixed when all dominos will be played
+		Collections.sort(Domino.currentDominos);
+		
 
 		// same with allPlayers and newOrder
 		Players.allPlayers.clear();
@@ -109,7 +121,7 @@ class Plateau {
 
 	private static void placeCastles() {
 		for (Plateau plateau : allPlateau) {
-			plateau.cases[4][4] = "Château"; // Castle at the center
+			plateau.cases[4][4] = "Chï¿½teau"; // Castle at the center
 		}
 	}
 
@@ -172,7 +184,7 @@ class Plateau {
 		// check cases exist, don't check above for imin
 		if (i > 0 && plateau.cases[i][j] != null && plateau.cases[i - 1][j] != null) {
 			if (plateau.cases[i][j].equals(plateau.cases[i - 1][j]) && !checkedCases[i - 1][j]) { // check above
-				score = countScore(plateau, i - 1, j, score, checkedCases);
+				score = countScore(plateau, i -	1, j, score, checkedCases);
 			}
 		}
 		// check cases exist, don't check left for jmin
@@ -205,7 +217,7 @@ class Domino extends Plateau implements Comparable<Domino> {
 																	// found
 		Scanner scanner = new Scanner(new File("dominos.csv")); // open csv file
 		scanner.nextLine(); // skip first line
-
+		// /DomiNation-master/DomiNations/src/dominos.csv
 		while (scanner.hasNextLine()) { // read line by line
 
 			Scanner dataScanner = new Scanner(scanner.nextLine()); // take one line
@@ -231,28 +243,85 @@ class Domino extends Plateau implements Comparable<Domino> {
 
 	public static int[] chooseCoordinates() {
 		int[] coordinates = new int[2];
-		// TODO choose coordinates
-		coordinates[0] = 0;
-		coordinates[1] = 0;
+		
+		Scanner scan = new Scanner(System.in);
+		System.out.println("Entrez la coordonÃ©e x du domino: ");
+		//while scan does not have an int between 0 and 9
+		while (!scan.hasNext("[0-9]")) {
+	        System.out.println("Entrez un nombre positif !");
+	        scan.next(); // this is important!
+	    }
+		int x = scan.nextInt();
+		
+		System.out.println("Entrez la coordonÃ©e y du domino: ");
+		while (!scan.hasNext("[0-9]")) {
+	        System.out.println("Entrez un nombre positif !");
+	        scan.next(); // this is important!
+	    }
+		int y = scan.nextInt();
+		
+		coordinates[0] = x;
+		coordinates[1] = y;
+		
+		//coordinates[0] = 0;
+		//coordinates[1] = 0;
 
 		return coordinates;
 	}
 
 	public static String chooseOrientation() {
 		String orientation = "";
-		// TODO choose orientation
+		
+		Scanner scan = new Scanner(System.in);
+		System.out.println("Entrez le sens du domino (up, down, left ou right) :");
+		orientation = scan.nextLine();
+		
+		// verify input
+		if(!orientation.matches("up|down|left|right") ) {
+			System.out.println("Orientation incorrecte !");
+			chooseOrientation();
+		}
 
 		return orientation;
 	}
 
 	public static Domino chooseDomino(Players player) {
 		int chosenNumber = 0;
-		Domino chosenDomino;
+		int index = 0;
+		Domino chosenDomino = null;
 
-		// TODO: select domino number
+		Scanner scan = new Scanner(System.in);
+		System.out.print("Domino jouables : ");
+		for (Domino domino : playableDominos) {
+			System.out.print("Domino " + domino.numDomino + ", ");
+		}
+		System.out.println("\n" + player.name + ":" + " Entrez le numÃ©ro du prochain domino que vous voulez jouer: ");
+		
+		
+		while (!scan.hasNextInt()) {
+	        System.out.println("Entrez un nombre positif !");
+	        scan.next(); // this is important!
+	    }
+		chosenNumber = scan.nextInt();
 
-		chosenDomino = playableDominos.get(chosenNumber);
-		Players.newOrder.set(chosenNumber, player);
+		for (Domino domino : playableDominos) {	
+	        if (domino.numDomino == chosenNumber ) {
+	            chosenDomino = domino;
+	            break;
+	        }
+	        index++;
+	    }
+		
+		// if still null chosenNumber not valid
+		if (chosenDomino == null) {
+			System.out.println("Entrez un numÃ©ro de domino valide !");
+			index = 0;
+			chooseDomino(player);
+		}
+
+		playableDominos.remove(chosenDomino);
+		currentDominos.add(chosenDomino);
+		Players.newOrder.set(index , player); // set order accordingly
 
 		return chosenDomino;
 	}
@@ -271,7 +340,6 @@ class Domino extends Plateau implements Comparable<Domino> {
 	public static void placeDomino(Domino domino, Plateau plateau, int x1, int y1, String orientation) {
 		int x2, y2;
 
-		// TODO: ask for coordinates
 		// Maybe a separate function ?
 		switch (orientation) {
 		case ("up"):
@@ -301,10 +369,10 @@ class Domino extends Plateau implements Comparable<Domino> {
 
 			ArrayList<String> near1 = getNearCases(plateau, x1, y1);
 			ArrayList<String> near2 = getNearCases(plateau, x2, y2);
-			near1.add("Château");
-			near2.add("Château");
 
 			// check if surrounding cases are the same type
+			// TODO: chÃ¢teaux
+
 			if (near1.contains(domino.type1) || near2.contains(domino.type2)) {
 				plateau.cases[x1][y1] = domino.type1;
 				plateau.cases[x2][y2] = domino.type2;
@@ -314,6 +382,7 @@ class Domino extends Plateau implements Comparable<Domino> {
 				System.out.println("Les dominos ne correspondent pas !");
 			}
 
+
 			// below is used to skip validation for debug
 			plateau.cases[x1][y1] = domino.type1;
 			plateau.cases[x2][y2] = domino.type2;
@@ -321,11 +390,57 @@ class Domino extends Plateau implements Comparable<Domino> {
 			plateau.couronnes[x2][y2] = domino.nbCouronne2;
 
 		} else {
-			System.out.println("Cases déjà prises !");
+			System.out.println("Cases dï¿½jï¿½ prises !");
 		}
+		
+		checkSize(plateau, x1, y1 , x2, y2);
+		
+		currentDominos.remove(domino);
 
 		afficherPlateau(); // redraw the board
 	}
+
+	private static void checkSize(Plateau plateau, int x1,int y1,int x2,int y2) {
+		loopColumns(x1, plateau);
+		if (x2 != x1) {
+			loopColumns(x2, plateau);
+		}
+		
+		loopRows(y1, plateau);
+		if (y2 != y1) {
+			loopRows(y2, plateau);
+		}
+		
+	}
+
+	private static void loopRows(int y, Plateau plateau) {
+		//loop through and count the number of nulls
+		int count = 0;
+		for (int i = 0; i < NB_CASES; i++) {
+			if(plateau.cases[i][y] != null) {
+				count++;
+			}
+		}		
+		if (count > 4) {
+			System.out.println("Votre colonne est plus grande que 5 Ã©lÃ©ments !");
+		}
+		count = 0;	
+	}
+
+	private static void loopColumns(int x, Plateau plateau) {
+		//loop through and count the number of nulls
+		int count = 0;
+		for (int i = 0; i < NB_CASES; i++) {
+			if(plateau.cases[x][i] != null) {
+				count++;
+			}
+		}		
+		if (count > 4) {
+			System.out.println("Votre ligne est plus grande que 5 Ã©lÃ©ments !");
+		}
+		count = 0;
+	}
+	
 
 	private static ArrayList<String> getNearCases(Plateau plateau, int x, int y) {
 		ArrayList<String> near = new ArrayList<String>();
@@ -419,6 +534,34 @@ class Players implements Comparable<Players> {
 
 			player.playerPlateau = Plateau.allPlateau.get(i);
 		}
+		
+		playersNumber();
+		
+		playersNames();
+	}
+
+	private static void playersNumber() {
+		Scanner scan = new Scanner(System.in);
+		System.out.println("Entrez le nombre de joueurs: ");
+		while (!scan.hasNext("[1-4]")) {
+	        System.out.println("Entrez un nombre entre 1 et 4 !");
+	        scan.next(); // this is important!
+	    }
+		Players.nbPlayers = scan.nextInt();
+		
+	}
+
+	private static void playersNames() {
+		int i = 0;
+		Scanner scan = new Scanner(System.in);
+		System.out.println("Entrez le nom de chaque joueur: ");
+		
+		for (Players player : allPlayers) {
+			System.out.println("Joueur " + i + ":");
+	        player.name = scan.nextLine();
+	        i++;
+		}
+		
 	}
 
 	static void givePlayersKings() {
@@ -432,7 +575,7 @@ class Players implements Comparable<Players> {
 		}
 
 		for (Players player : allPlayers) {
-			System.out.println(player + ": " + player.playerKings);
+			System.out.println(player.name + ": " + player.playerKings);
 		}
 	}
 
@@ -440,7 +583,7 @@ class Players implements Comparable<Players> {
 	public static void shuffleKings() {
 
 		/*
-		 * Used the Fisher–Yates shuffle, hope we were allowed to implement already
+		 * Used the Fisherï¿½Yates shuffle, hope we were allowed to implement already
 		 * existing methods. Did the implementation myself.
 		 */
 
@@ -468,7 +611,7 @@ class Players implements Comparable<Players> {
 			for (Integer score : player.playerPlateau.score) {
 				player.scoreTotal += score;
 			}
-			System.out.println(player + "	" + player.scoreTotal);
+			System.out.println(player.name + "	" + player.scoreTotal);
 		}
 
 		Collections.sort(allPlayers); // sort players to get positions by score
@@ -485,10 +628,9 @@ class Players implements Comparable<Players> {
 
 public class Main {
 	public static void main(String[] args) {
-
-		// TODO: Select number of players with UI
-
+		
 		Players.nbPlayers = 2;
+		
 		Plateau.initialize();
 
 		int x1 = 1;
