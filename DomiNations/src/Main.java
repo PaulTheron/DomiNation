@@ -16,6 +16,7 @@ class Plateau {
 	public static void initialize() {
 		int nbRemove; // number of dominos to be removed
 
+		Players.createPlayers(); // explicit
 		createPlateau();
 		placeCastles();
 		Kings.createKings(); // explicit
@@ -40,9 +41,10 @@ class Plateau {
 		}
 		Domino.removeDominos(nbRemove);
 
-		Players.createPlayers(); // explicit
+		
 		Players.givePlayersKings(); // explicit		
 
+		//endGame();
 		firstTurn();
 	}
 
@@ -116,6 +118,14 @@ class Plateau {
 		for (int i = 0; i < Players.nbPlayers; i++) {
 			Plateau plat = new Plateau();
 			allPlateau.add(plat);
+			
+			
+		}
+		int i = 0;
+		
+		for (Players player : Players.allPlayers) {
+			player.playerPlateau = Plateau.allPlateau.get(i);
+			i++;
 		}
 	}
 
@@ -526,16 +536,16 @@ class Players implements Comparable<Players> {
 	int scoreTotal;
 
 	static void createPlayers() {
+		playersNumber();
+		
 		for (int i = 0; i < nbPlayers; i++) {
 			Players player = new Players();
 			allPlayers.add(player);
 			// for now we don't have any order set.
 			newOrder.add(null);
-
-			player.playerPlateau = Plateau.allPlateau.get(i);
 		}
 		
-		playersNumber();
+		
 		
 		playersNames();
 	}
@@ -616,7 +626,7 @@ class Players implements Comparable<Players> {
 
 		Collections.sort(allPlayers); // sort players to get positions by score
 		// last player in the list is the winner
-		System.out.println("Vainceur :" + Players.allPlayers.get(allPlayers.size() - 1));
+		System.out.println("Winner :" + Players.allPlayers.get(allPlayers.size() - 1).name);
 	}
 
 	@Override
@@ -629,12 +639,11 @@ class Players implements Comparable<Players> {
 public class Main {
 	public static void main(String[] args) {
 		
-		Players.nbPlayers = 2;
-		
 		Plateau.initialize();
 
 		int x1 = 1;
 		int y1 = 3;
+		
 
 		System.out.println((Domino.allDominoes.get(1).type1 + "" + Domino.allDominoes.get(1).type2));
 		Domino.placeDomino(Domino.allDominoes.get(1), Plateau.allPlateau.get(0), x1, y1, "right");
@@ -654,6 +663,7 @@ public class Main {
 		Plateau.allPlateau.get(1).cases[2][1] = "Mine";
 		Plateau.allPlateau.get(1).cases[3][1] = "Mine"; // should have 6 points
 		Plateau.afficherPlateau();
+		
 
 		Plateau.endGame();
 
