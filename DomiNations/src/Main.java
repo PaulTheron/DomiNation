@@ -31,6 +31,8 @@ class Plateau {
 		case 3:
 			nbRemove = 12;
 			Kings.removeKing(); // only case with 3 kings
+			// we only have 3 dominos
+			Players.newOrder.remove(0);
 			break;
 		case 4:
 			nbRemove = 0;
