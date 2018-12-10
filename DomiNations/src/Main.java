@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Random;
 import java.util.Scanner;
 
+//test
 class Plateau {
 	static final int NB_CASES = 9;
 	String[][] cases = new String[NB_CASES][NB_CASES];
