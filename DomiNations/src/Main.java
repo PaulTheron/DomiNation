@@ -1,6 +1,7 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Random;
 import java.util.Scanner;
@@ -47,75 +48,6 @@ class Plateau {
 		Players.givePlayersKings(); // explicit
 
 		// endGame();
-		firstTurn();
-	}
-
-	private static void firstTurn() {
-		// gives a random order for players
-		Players.shuffleKings();
-		Domino.nextDominos(); // first domino line
-
-		do {
-			for (Players player : Players.allPlayers) {
-				// choose his next domino
-				player.playerDominos.add(Domino.chooseDomino(player));
-			}
-		} while (!Domino.playableDominos.isEmpty());
-
-		// copy playable into current
-		Domino.currentDominos.addAll(Domino.playableDominos);
-		// TODO: order not taken into account here
-		nextTurn();
-	}
-
-	private static void nextTurn() {
-		String orientation;
-		int[] coordinates = new int[2];
-
-		// clears the next order of players
-		Players.newOrder.replaceAll(e -> null);
-		System.out.println(Players.newOrder);
-		// new domino line
-		Domino.nextDominos();
-
-		// TO SEE WORKING PROTOTYPE, ADD MULTI LINE COMMENT: /*
-		do {
-			for (Players player : Players.allPlayers) {
-
-				coordinates = Domino.chooseCoordinates();
-				orientation = Domino.chooseOrientation();
-
-				// TODO place again if not correct
-				Domino.placeDomino(player.playerDominos.get(0), player.playerPlateau, coordinates[0], coordinates[1],
-						orientation);
-				// remove the placed domino
-				player.playerDominos.remove(player.playerDominos.get(0));
-
-				// choose his next domino
-				player.playerDominos.add(Domino.chooseDomino(player));
-			}
-
-			// currentDominos deleted in placeDomino
-			// added in chooseDomino then sorted
-			// slight issue that will be fixed when all dominos will be played
-			Collections.sort(Domino.currentDominos);
-
-			// same with allPlayers and newOrder
-			System.out.println(Players.newOrder);
-			Players.allPlayers.clear();
-			Players.allPlayers.addAll(Players.newOrder);
-
-			if (Domino.allDominoes.size() == 0) { // TODO: other finishing checks
-				endGame();
-			} else {
-				nextTurn();
-			}
-
-		} while (!Domino.playableDominos.isEmpty());
-
-		// END OF MULTI LINE COMMENT FOR DEBUG */
-
-		// TODO: if can't place domino throw it away
 	}
 
 	private static void createPlateau() {
@@ -133,7 +65,7 @@ class Plateau {
 
 	private static void placeCastles() {
 		for (Plateau plateau : allPlateau) {
-			plateau.cases[4][4] = "Ch�teau"; // Castle at the center
+			plateau.cases[4][4] = "Château"; // Castle at the center
 		}
 	}
 
@@ -224,6 +156,7 @@ class Domino extends Plateau implements Comparable<Domino> {
 	static ArrayList<Domino> allDominoes = new ArrayList<Domino>();
 	static ArrayList<Domino> currentDominos = new ArrayList<Domino>();
 	static ArrayList<Domino> playableDominos = new ArrayList<Domino>();
+	static ArrayList<Integer> dominoOrder = new ArrayList<Integer>();
 
 	public static void getDominoes() throws FileNotFoundException { // import dominoes, throws exception if file not
 																	// found
@@ -326,7 +259,10 @@ class Domino extends Plateau implements Comparable<Domino> {
 
 		playableDominos.remove(chosenDomino);
 		currentDominos.add(chosenDomino);
-		Players.newOrder.set(index, player); // set order accordingly
+		System.out.println("index:" + dominoOrder.get(index) + " player:" + player);
+
+		Players.newOrder.set(dominoOrder.get(index), player); // set order accordingly
+		dominoOrder.remove(index);
 
 		return chosenDomino;
 	}
@@ -370,14 +306,16 @@ class Domino extends Plateau implements Comparable<Domino> {
 		}
 
 		// Below creates an array with the cases around the selected case.
+		// TODO: out of bound if not in plateau
 		if (plateau.cases[x1][y1] == null && plateau.cases[x2][y2] == null) { // check if cases are empty
 
 			ArrayList<String> near1 = getNearCases(plateau, x1, y1);
 			ArrayList<String> near2 = getNearCases(plateau, x2, y2);
 
 			// check if surrounding cases are the same type
-			/* regex below if we want
-			 * if (near1.toString().matches(".*"+domino.type1+".*|.*Ch.teau.*")) {
+			/*
+			 * regex below if we want if
+			 * (near1.toString().matches(".*"+domino.type1+".*|.*Ch.teau.*")) {
 			 * System.out.println("Success !"); }
 			 */
 
@@ -406,6 +344,52 @@ class Domino extends Plateau implements Comparable<Domino> {
 		currentDominos.remove(domino);
 
 		afficherPlateau(); // redraw the board
+	}
+
+	public static Boolean isPlayable(Domino domino, Plateau plateau) {
+		ArrayList<String> validCases = new ArrayList<String>();
+		validCases.add(domino.type1);
+		validCases.add(domino.type2);
+		validCases.add("Château");
+
+		// for every case
+		for (int i = 0; i < plateau.cases.length; i++) { // rows
+			for (int j = 0; j < plateau.cases[0].length; j++) { // columns
+				// if checked contains a possible solutions
+				if (validCases.contains(plateau.cases[i][j])) {
+					// if the surrounding case is free
+					if (plateau.cases[i + 1][j] == null) {
+						ArrayList<String> near = getNullCases(plateau, i + 1, j);
+						// if one of the near cases is free
+						if (near.contains(null)) {
+							return true;
+						}
+					}
+					if (plateau.cases[i - 1][j] == null) {
+						ArrayList<String> near = getNullCases(plateau, i - 1, j);
+						if (near.contains(null)) {
+							return true;
+						}
+					}
+					if (plateau.cases[i][j + 1] == null) {
+						ArrayList<String> near = getNullCases(plateau, i, j + 1);
+						if (near.contains(null)) {
+							return true;
+						}
+					}
+					if (plateau.cases[i][j - 1] == null) {
+						ArrayList<String> near = getNullCases(plateau, i, j - 1);
+						if (near.contains(null)) {
+							return true;
+						}
+					}
+
+				}
+
+			}
+		}
+		return false;
+
 	}
 
 	private static void checkSize(Plateau plateau, int x1, int y1, int x2, int y2) {
@@ -467,8 +451,27 @@ class Domino extends Plateau implements Comparable<Domino> {
 		return near;
 	}
 
+	private static ArrayList<String> getNullCases(Plateau plateau, int x, int y) {
+		ArrayList<String> near = new ArrayList<String>();
+
+		if (x < NB_CASES - 1 && plateau.cases[x + 1][y] == null) { // avoid out of bound
+			near.add(plateau.cases[x + 1][y]); // below
+		}
+		if (y < NB_CASES - 1 && plateau.cases[x][y + 1] == null) {
+			near.add(plateau.cases[x][y + 1]); // right
+		}
+		if (x > 0 && plateau.cases[x - 1][y] == null) {
+			near.add(plateau.cases[x - 1][y]); // above
+		}
+		if (y > 0 && plateau.cases[x][y - 1] == null) {
+			near.add(plateau.cases[x][y - 1]); // left
+		}
+		return near;
+	}
+
 	protected static void nextDominos() {
-		// clear old list
+		// clear old lists
+		dominoOrder.clear();
 		playableDominos.clear();
 
 		for (int i = 0; i < Kings.allKings.size(); i++) { // for each king in game
@@ -478,9 +481,13 @@ class Domino extends Plateau implements Comparable<Domino> {
 			playableDominos.add(allDominoes.get(n));
 			allDominoes.remove(n);// removes the selected domino from the list
 
-			// TODO: draw the domino and then flip it ; draw(allDominoes.get(n))
 		}
 		Collections.sort(playableDominos);
+
+		// sets the domino order with ordered playables
+		for (int j = 0; j < playableDominos.size(); j++) {
+			dominoOrder.add(j);
+		}
 
 		System.out.print("Domino current : ");
 		for (Domino domino : currentDominos) {
@@ -638,6 +645,8 @@ public class Main {
 	public static void main(String[] args) {
 
 		Plateau.initialize();
+		firstTurn();
+		nextTurn();
 
 		int x1 = 1;
 		int y1 = 3;
@@ -664,5 +673,77 @@ public class Main {
 		System.out.println(Plateau.allPlateau.get(0).cases.length);
 		Plateau.endGame();
 
+	}
+
+	private static void firstTurn() {
+		// gives a random order for players
+		Players.shuffleKings();
+		Domino.nextDominos(); // first domino line
+
+		do {
+			for (Players player : Players.allPlayers) {
+				// choose his next domino
+				player.playerDominos.add(Domino.chooseDomino(player));
+			}
+		} while (!Domino.playableDominos.isEmpty());
+
+		// copy playable into current
+		Domino.currentDominos.addAll(Domino.playableDominos);
+
+		System.out.println(Players.newOrder);
+		Players.allPlayers.clear();
+		Players.allPlayers.addAll(Players.newOrder);
+	}
+
+	private static void nextTurn() {
+		String orientation;
+		int[] coordinates = new int[2];
+
+		// clears the next order of players
+		Players.newOrder.replaceAll(e -> null);
+		System.out.println(Players.newOrder);
+		// new domino line
+		Domino.nextDominos();
+
+		do { // do while used for 2 players
+			for (Players player : Players.allPlayers) {
+				// check if domino can be placed
+
+				if (!Domino.isPlayable(player.playerDominos.get(0), player.playerPlateau)) {
+					System.out.println("vous ne pouvez pas jouer ce domino !");
+					player.playerDominos.remove(player.playerDominos.get(0));
+				}
+
+				coordinates = Domino.chooseCoordinates();
+				orientation = Domino.chooseOrientation();
+
+				// TODO place again if not correct
+				Domino.placeDomino(player.playerDominos.get(0), player.playerPlateau, coordinates[0], coordinates[1],
+						orientation);
+				// remove the placed domino
+				player.playerDominos.remove(player.playerDominos.get(0));
+
+				// choose his next domino
+				player.playerDominos.add(Domino.chooseDomino(player));
+			}
+
+			// currentDominos deleted in placeDomino
+			// added in chooseDomino then sorted
+			Collections.sort(Domino.currentDominos);
+
+			// same with allPlayers and newOrder
+			System.out.println(Players.newOrder);
+			Players.allPlayers.clear();
+			Players.allPlayers.addAll(Players.newOrder);
+
+			if (Domino.allDominoes.size() == 0) { // TODO: other finishing checks
+				Plateau.endGame();
+			} else {
+				nextTurn();
+			}
+
+		} while (!Domino.playableDominos.isEmpty());
+
+		// TODO: if can't place domino throw it away
 	}
 }
