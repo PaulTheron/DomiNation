@@ -346,7 +346,7 @@ public static ArrayList<ArrayList<Integer>> playablePosition(Domino domino, Plat
 		return crown;
 		}
     
-	public static int centerTwonHall(Plateau plateau, Domino domino) {
+	public static int centerTownHall(Plateau plateau, Domino domino) {
 		// Pour chaque domino on va retourner leur position qui permettent le centrage de l'hdv
 		ArrayList<ArrayList<Integer>> positionJouable = playablePosition(domino, plateau);
 		int compteur = 0;
