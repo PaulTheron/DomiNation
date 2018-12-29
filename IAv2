@@ -398,4 +398,45 @@ public static ArrayList<ArrayList<Integer>> playablePosition(Domino domino, Plat
 		ptPotentiel = nbrType * nbrCouronne;
 		return ptPotentiel;
 		}
-  
+  // FONCTION PRINCIPALE
+  ArrayList<Domino> domJouable = playableDom(plateau);
+		Domino domBest = domJouable.get(0);
+		int scoreMem = 0;
+		int c1= 100;
+		int c2= 100;
+		int c3= 100;
+		int c4= 100;
+		int c5= 100;
+		int x1 = 0;
+		int y1 = 0;
+		int x2 = 0;
+		int y2 = 0;
+		for (Domino domino: domJouable) {
+			int score = c1 * nbrPoint(plateau,domino).get(0) + c2 * crownDom(domino) + c3 * centerTownHall(plateau,domino).get(0) + c4 * invest(domino) + c5 * 0 ;
+			if (score > scoreMem) {
+				domBest = domino;
+				scoreMem = score;
+			}
+		}
+		ArrayList<Integer> centrerChateau = centerTownHall(plateau,domBest);
+		ArrayList<ArrayList<Integer>> positionJouable = playablePosition(domBest,plateau);
+		//Si ce domino peut conserver le chateau centrer on le fait
+		if (centerTownHall(plateau,domBest).get(0) == 1) {
+			x1 = centrerChateau.get(1);
+			y1 = centrerChateau.get(2);
+			x2 = centrerChateau.get(3);
+			y2 = centrerChateau.get(4);
+			
+		}
+		//Sinon on prend la première position jouable pour le domino
+		else {
+			x1 = positionJouable.get(0).get(0);
+			y1 = positionJouable.get(0).get(1);
+			x2 = positionJouable.get(0).get(2);
+			y2 = positionJouable.get(0).get(3);
+		}
+		
+		plateau.cases[x1][y1] = domBest.type1;
+		plateau.cases[x2][y2] = domBest.type2;
+		plateau.couronnes[x2][y2] = domBest.nbCouronne1;
+		plateau.couronnes[x2][y2] = domBest.nbCouronne2;
