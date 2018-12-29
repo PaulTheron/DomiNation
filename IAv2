@@ -1,0 +1,351 @@
+public static ArrayList<ArrayList<Integer>> playablePosition(Domino domino, Plateau plateau) {
+			ArrayList<String> validCases = new ArrayList<String>();
+			ArrayList<Integer> coordonnée = new ArrayList<Integer>();
+			ArrayList<ArrayList<Integer>> dominoPosition = new ArrayList<ArrayList<Integer>>();
+			validCases.add(domino.type1);
+			validCases.add(domino.type2);
+			validCases.add("Château");
+			ArrayList<String> validType1 = new ArrayList<String>();
+			validType1.add(domino.type1);
+			validType1.add("Château");
+			
+			
+			// for every case
+			for (int i = 0; i < plateau.cases.length; i++) { // rows
+				for (int j = 0; j < plateau.cases[0].length; j++) { // columns
+					// if checked contains a possible solutions
+					if (validCases.contains(plateau.cases[i][j])) {
+						// if the surrounding case is free
+						if (plateau.cases[i + 1][j] == null) {
+							ArrayList<String> near = getNullCases1(plateau, i + 1, j);
+							// if one of the near cases is free
+							if (near.get(1)==null) {
+								if (validType1.contains(plateau.cases[i][j])) {
+									coordonnée.add(i+1);
+									coordonnée.add(j);
+									coordonnée.add(i+1);
+									coordonnée.add(j+1);
+									dominoPosition.add(new ArrayList<Integer>(coordonnée));
+									coordonnée.clear();
+								}else {
+									coordonnée.add(i+1);
+									coordonnée.add(j+1);
+									coordonnée.add(i+1);
+									coordonnée.add(j);
+									dominoPosition.add(new ArrayList<Integer>(coordonnée));
+									coordonnée.clear();	
+									}
+								}
+							
+							if (near.get(2)==null) {
+								if (validType1.contains(plateau.cases[i][j])) {
+									coordonnée.add(i+1);
+									coordonnée.add(j);
+									coordonnée.add(i+2);
+									coordonnée.add(j);
+									dominoPosition.add(new ArrayList<Integer>(coordonnée));
+									coordonnée.clear();
+								}else {
+									coordonnée.add(i+2);
+									coordonnée.add(j);
+									coordonnée.add(i+1);
+									coordonnée.add(j);
+									dominoPosition.add(new ArrayList<Integer>(coordonnée));
+									coordonnée.clear();	
+									}
+							}
+							if (near.get(3)==null) {
+								if (validType1.contains(plateau.cases[i][j])) {
+									coordonnée.add(i+1);
+									coordonnée.add(j);
+									coordonnée.add(i+1);
+									coordonnée.add(j-1);
+									dominoPosition.add(new ArrayList<Integer>(coordonnée));
+									coordonnée.clear();
+								}else {
+									coordonnée.add(i+1);
+									coordonnée.add(j-1);
+									coordonnée.add(i+1);
+									coordonnée.add(j);
+									dominoPosition.add(new ArrayList<Integer>(coordonnée));
+									coordonnée.clear();	
+									}
+							}
+						}
+						if (plateau.cases[i - 1][j] == null) {
+							ArrayList<String> near = getNullCases1(plateau, i - 1, j);
+							if (near.get(0)==null) {
+								if (validType1.contains(plateau.cases[i][j])) {
+									coordonnée.add(i-1);
+									coordonnée.add(j);
+									coordonnée.add(i-2);
+									coordonnée.add(j);
+									dominoPosition.add(new ArrayList<Integer>(coordonnée));
+									coordonnée.clear();
+								}else {
+									coordonnée.add(i-2);
+									coordonnée.add(j);
+									coordonnée.add(i-1);
+									coordonnée.add(j);
+									dominoPosition.add(new ArrayList<Integer>(coordonnée));
+									coordonnée.clear();	
+									}
+							}
+							if (near.get(1)==null) {
+								if (validType1.contains(plateau.cases[i][j])) {
+									coordonnée.add(i-1);
+									coordonnée.add(j);
+									coordonnée.add(i-1);
+									coordonnée.add(j+1);
+									dominoPosition.add(new ArrayList<Integer>(coordonnée));
+									coordonnée.clear();
+								}else {
+									coordonnée.add(i-1);
+									coordonnée.add(j+1);
+									coordonnée.add(i-1);
+									coordonnée.add(j);
+									dominoPosition.add(new ArrayList<Integer>(coordonnée));
+									coordonnée.clear();	
+									}
+							}
+							if (near.get(3)==null) {
+								if (validType1.contains(plateau.cases[i][j])) {
+									coordonnée.add(i-1);
+									coordonnée.add(j);
+									coordonnée.add(i-1);
+									coordonnée.add(j-1);
+									dominoPosition.add(new ArrayList<Integer>(coordonnée));
+									coordonnée.clear();
+								}else {
+									coordonnée.add(i-1);
+									coordonnée.add(j-1);
+									coordonnée.add(i-1);
+									coordonnée.add(j);
+									dominoPosition.add(new ArrayList<Integer>(coordonnée));
+									coordonnée.clear();	
+									}
+							}
+						}
+						if (plateau.cases[i][j + 1] == null) {
+							ArrayList<String> near = getNullCases1(plateau, i, j + 1);
+							if (near.get(0)==null) {
+								if (validType1.contains(plateau.cases[i][j])) {
+									coordonnée.add(i);
+									coordonnée.add(j+1);
+									coordonnée.add(i-1);
+									coordonnée.add(j+1);
+									dominoPosition.add(new ArrayList<Integer>(coordonnée));
+									coordonnée.clear();
+								}else {
+									coordonnée.add(i-1);
+									coordonnée.add(j+1);
+									coordonnée.add(i);
+									coordonnée.add(j+1);
+									dominoPosition.add(new ArrayList<Integer>(coordonnée));
+									coordonnée.clear();	
+									}
+							}
+							if (near.get(1)==null) {
+								if (validType1.contains(plateau.cases[i][j])) {
+									coordonnée.add(i);
+									coordonnée.add(j+1);
+									coordonnée.add(i);
+									coordonnée.add(j+2);
+									dominoPosition.add(new ArrayList<Integer>(coordonnée));
+									coordonnée.clear();
+								}else {
+									coordonnée.add(i);
+									coordonnée.add(j+2);
+									coordonnée.add(i);
+									coordonnée.add(j+1);
+									dominoPosition.add(new ArrayList<Integer>(coordonnée));
+									coordonnée.clear();	
+									}
+							}
+							if (near.get(2)==null) {
+								if (validType1.contains(plateau.cases[i][j])) {
+									coordonnée.add(i);
+									coordonnée.add(j+1);
+									coordonnée.add(i+1);
+									coordonnée.add(j+1);
+									dominoPosition.add(new ArrayList<Integer>(coordonnée));
+									coordonnée.clear();
+								}else {
+									coordonnée.add(i);
+									coordonnée.add(j+1);
+									coordonnée.add(i+1);
+									coordonnée.add(j+1);
+									dominoPosition.add(new ArrayList<Integer>(coordonnée));
+									coordonnée.clear();	
+									}
+							}
+						}
+						if (plateau.cases[i][j - 1] == null) {
+							ArrayList<String> near = getNullCases1(plateau, i, j - 1);
+							if (near.get(0)==null) {
+								if (validType1.contains(plateau.cases[i][j])) {
+									coordonnée.add(i);
+									coordonnée.add(j-1);
+									coordonnée.add(i-1);
+									coordonnée.add(j-1);
+									dominoPosition.add(new ArrayList<Integer>(coordonnée));
+									coordonnée.clear();
+								}else {
+									coordonnée.add(i-1);
+									coordonnée.add(j-1);
+									coordonnée.add(i);
+									coordonnée.add(j-1);
+									dominoPosition.add(new ArrayList<Integer>(coordonnée));
+									coordonnée.clear();	
+									}
+							}
+							if (near.get(2)==null) {
+								if (validType1.contains(plateau.cases[i][j])) {
+									coordonnée.add(i);
+									coordonnée.add(j-1);
+									coordonnée.add(i+1);
+									coordonnée.add(j-1);
+									dominoPosition.add(new ArrayList<Integer>(coordonnée));
+									coordonnée.clear();
+								}else {
+									coordonnée.add(i+1);
+									coordonnée.add(j-1);
+									coordonnée.add(i);
+									coordonnée.add(j-1);
+									dominoPosition.add(new ArrayList<Integer>(coordonnée));
+									coordonnée.clear();	
+									}
+							}
+							if (near.get(3)==null) {
+								if (validType1.contains(plateau.cases[i][j])) {
+									coordonnée.add(i);
+									coordonnée.add(j-1);
+									coordonnée.add(i);
+									coordonnée.add(j-2);
+									dominoPosition.add(new ArrayList<Integer>(coordonnée));
+									coordonnée.clear();
+								}else {
+									coordonnée.add(i);
+									coordonnée.add(j-2);
+									coordonnée.add(i);
+									coordonnée.add(j-1);
+									dominoPosition.add(new ArrayList<Integer>(coordonnée));
+									coordonnée.clear();	
+									}
+							}
+						}
+
+					}
+
+				}
+			}
+			return dominoPosition;
+
+	}
+  
+  private static ArrayList<String> getNullCases1(Plateau plateau, int x, int y) {
+		ArrayList<String> near = new ArrayList<String>();
+
+		if (x-1 < 0) { // above
+			near.add("horsplateau");
+		}
+		
+		else{
+			near.add(plateau.cases[x - 1][y]); // above
+			
+		}
+		
+		if (y+1 > 9) { // right
+			near.add("horsplateau");
+		}else {
+		near.add(plateau.cases[x][y + 1]); // right
+		}
+		
+		if (x+1 > 9) { // below
+			near.add("horsplateau");
+		}else {
+		near.add(plateau.cases[x + 1][y]); // below
+		}
+		
+		if (y-1 < 0) { // left
+			near.add("horsplateau");
+		}else {
+		near.add(plateau.cases[x][y - 1]); // left
+		}
+		
+		return near;
+	}
+  
+  public static ArrayList<Domino> playableDom(Plateau plateau) {
+		ArrayList<Domino> domJouable = new ArrayList<Domino>();
+			//On balaye tous les dominos qu'il reste
+			for (Domino domino : playableDominos) {
+				//test si la liste n'est pas vide
+				if (!playablePosition(domino, plateau).isEmpty()) {
+					// On ajoute les domino jouable à la liste
+					 domJouable.add(domino);
+				}
+			}
+			//retourne la liste des dominos jouable
+			return domJouable;
+	}
+  
+	// retourne la somme des couronnes sur le domino
+	public static int crownDom(Domino domino) {
+		int crown = domino.nbCouronne1 + domino.nbCouronne2;
+		return crown;
+		}
+    
+	public static int centerTwonHall(Plateau plateau, Domino domino) {
+		// Pour chaque domino on va retourner leur position qui permettent le centrage de l'hdv
+		ArrayList<ArrayList<Integer>> positionJouable = playablePosition(domino, plateau);
+		int compteur = 0;
+		for (ArrayList<Integer> position : positionJouable) {
+			for (int coordonnées : position) {
+				//Si une des coordonnées est déjà pas compatible on peut sortir de la boucle for
+				if ((coordonnées > 6) || (coordonnées < 2)){
+					break;
+				}
+				//Si la coordonnées convient on ajoute 1 au compteur
+				if ((coordonnées <= 6) || (coordonnées >= 2)) {
+					compteur++;
+				}
+			}
+			// Si compteur égal à 4 les 4 coordonnées la position du domino va permettre le centrage du chateau
+			if (compteur == 4) {
+				return 1;
+			//Si c'est pas le cas il faut reinitialiser le compteur à 0 pour tester la prochaine position
+			}else {
+				compteur = 0;
+			}
+		}
+		
+		return 0;
+	}
+	
+	public static int invest(Domino domino) {
+		int nbrType = 0;
+		int nbrCouronne = 0;
+		int ptPotentiel;
+		for (Domino dominoRestant : allDominoes) {
+			if (domino.type1 == dominoRestant.type1){
+				nbrType++;
+				nbrCouronne = nbrCouronne + dominoRestant.nbCouronne1;
+			}
+			if (domino.type1 == dominoRestant.type2) {
+				nbrType++;
+				nbrCouronne = nbrCouronne + dominoRestant.nbCouronne2;
+			}
+			if (domino.type2 == dominoRestant.type1){
+				nbrType++;
+				nbrCouronne = nbrCouronne + dominoRestant.nbCouronne1;
+			}
+			if (domino.type2 == dominoRestant.type2) {
+				nbrType++;
+				nbrCouronne = nbrCouronne + dominoRestant.nbCouronne2;
+			}
+		}
+		ptPotentiel = nbrType * nbrCouronne;
+		return ptPotentiel;
+		}
+  
