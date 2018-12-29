@@ -276,6 +276,56 @@ public static ArrayList<ArrayList<Integer>> playablePosition(Domino domino, Plat
 		return near;
 	}
   
+  public static ArrayList<Integer> nbrPoint(Plateau plateau, Domino domino) {
+			ArrayList<Integer> bestNumDomino = new ArrayList<Integer>();
+			ArrayList<ArrayList<Integer>> positionJouable = playablePosition(domino, plateau);
+			for (ArrayList<Integer> position : positionJouable) {
+				//Création d'un plateau virtuel avec le domino posé à une des positions possible
+				Plateau plateauVirtuel = plateau;
+
+				plateauVirtuel.cases[position.get(0)][position.get(1)] = domino.type1;
+				plateauVirtuel.cases[position.get(2)][position.get(3)] = domino.type2;
+				plateauVirtuel.couronnes[position.get(0)][position.get(1)] = domino.nbCouronne1;
+				plateauVirtuel.couronnes[position.get(2)][position.get(3)] = domino.nbCouronne2;
+				//lancemenent de la fonction comptage de point du coup après avoir joué ce domino on garde en valeur cette valeur
+				int score[] = { 0, 0 }; // mult, couronnes
+				int scoreTotal = 0;
+				int scoreMax = 0;
+				boolean[][] checkedCases = new boolean[NB_CASES][NB_CASES];
+				for (int i = 0; i < plateau.cases.length; i++) { // rows
+					for (int j = 0; j < plateau.cases[0].length; j++) { // columns
+						int mult[] = Plateau.countScore(plateauVirtuel, i, j, score, checkedCases);
+						
+						scoreTotal = scoreTotal + mult[0] * mult[1];
+						score[0] = 0;
+						score[1] = 0;
+					}
+		
+				}
+				checkedCases = new boolean[NB_CASES][NB_CASES];
+				//initialisation de la liste qui retournera le nombre de point avec sa position
+				if ((scoreTotal > scoreMax) && (bestNumDomino.isEmpty())){
+					scoreMax = scoreTotal;
+					bestNumDomino.add(scoreMax);
+					bestNumDomino.add(position.get(0));
+					bestNumDomino.add(position.get(1));
+					bestNumDomino.add(position.get(2));
+					bestNumDomino.add(position.get(3));
+				//Si la liste est deja initialisé on changera les valeurs de cette liste
+				}else if ((scoreTotal > scoreMax)){
+					scoreMax = scoreTotal;
+					bestNumDomino.add(0,scoreMax);
+					bestNumDomino.add(1,position.get(0));
+					bestNumDomino.add(2,position.get(0));
+					bestNumDomino.add(3,position.get(0));
+					bestNumDomino.add(4,position.get(0));
+					
+				}
+			}
+			//On retourne le nombre de point et sa position optimiser
+			return bestNumDomino;
+		}
+		
   public static ArrayList<Domino> playableDom(Plateau plateau) {
 		ArrayList<Domino> domJouable = new ArrayList<Domino>();
 			//On balaye tous les dominos qu'il reste
