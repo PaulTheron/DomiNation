@@ -1,0 +1,241 @@
+// classe DomiNationUIMain
+
+package DomiNation;
+
+import org.newdawn.slick.*;
+import org.newdawn.slick.state.*;
+
+public class DomiNationUIMain extends StateBasedGame {
+
+	public static final String gameName = "DomiNation";
+	public static final int menu = 0;
+	public static final int choosePlayers = 1;
+	public static final int play = 2;
+	
+	public DomiNationUIMain(String gamename) {
+		super(gamename);
+		this.addState(new DomiNationUI(menu));
+		this.addState(new DomiNationUIChoosePlayers(choosePlayers));
+		this.addState(new DomiNationUIPlay(play));
+	}
+	
+	public void initStatesList(GameContainer gc) throws SlickException {
+		this.getState(menu).init(gc, this);
+		this.getState(choosePlayers).init(gc, this);
+		this.getState(play).init(gc, this);
+		this.enterState(menu);
+	}
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+
+		AppGameContainer appGC;
+		try {
+			appGC = new AppGameContainer(new DomiNationUIMain(gameName));
+			appGC.setDisplayMode(800, 600, false);
+			appGC.start();
+			
+		} catch(SlickException e) {
+			e.printStackTrace();
+			
+		}
+	}
+}
+
+
+// classe DomiNationUI
+
+package DomiNation;
+
+import org.lwjgl.input.Mouse;
+import org.newdawn.slick.*;
+import org.newdawn.slick.state.*;
+
+public class DomiNationUI extends BasicGameState {
+	
+	Image background;
+	Image playNow;
+	Image exitGame;
+	
+	public DomiNationUI(int state) {
+	
+	}
+
+	public void init(GameContainer gc, StateBasedGame sbg) throws SlickException {
+		
+		background = new Image("DNRes/background.png");
+		playNow = new Image("DNRes/playNow.png");
+		exitGame = new Image("DNRes/exitGame.png");
+	}
+
+	public void render(GameContainer gc, StateBasedGame sbg, Graphics g) throws SlickException {
+		
+		background.draw();
+		playNow.draw(200, 300);
+		exitGame.draw(200, 400);
+	}
+	
+	public void update(GameContainer gc, StateBasedGame sbg, int delta) throws SlickException {
+				
+		double mouseX = Mouse.getX();
+		double mouseY = Mouse.getY();
+		
+		// playNow button
+		if ((mouseX>200 && mouseX<411) && (mouseY>249 && mouseY<300)) {
+			if (Mouse.isButtonDown(0)) {
+				sbg.enterState(1);
+			}
+		}
+		// exitGame button
+		if ((mouseX>200 && mouseX<411) && (mouseY>149 && mouseY<200)) {
+			if (Mouse.isButtonDown(0)) {
+				System.exit(0);
+			}
+		}
+	}
+	
+	public int getID() {
+		return 0;
+	}
+}
+
+
+// classe DomiNationUIChoosePlayers
+
+package DomiNation;
+
+import java.awt.Font;
+import java.util.ArrayList;
+
+import org.lwjgl.input.Mouse;
+import org.newdawn.slick.*;
+import org.newdawn.slick.gui.*;
+import org.newdawn.slick.state.*;
+
+public class DomiNationUIChoosePlayers extends BasicGameState {
+	
+	// liste qui va contenir les boutons de choix du nb de joueurs
+	ArrayList<NumberOfPlayersButton> buttons;
+
+	boolean players = false;
+	int nbOfPlayers = 0;
+	
+	String playersName = "";
+	UnicodeFont myFont;
+	TextField tf;
+	
+	public DomiNationUIChoosePlayers(int state) {
+		
+	}
+
+	public void init(GameContainer gc, StateBasedGame sbg) throws SlickException {
+		
+		buttons = new ArrayList<NumberOfPlayersButton>();
+		
+		for (int i=0; i<4; i++) {
+			buttons.add(new NumberOfPlayersButton(50, 50, 100*(i+1), 200, String.valueOf(i+1)));
+		}
+		
+		Font font = new Font("Courier", Font.PLAIN,20);
+		myFont = new UnicodeFont(font);
+		
+		
+		tf = new TextField(gc, myFont, 100, 300, 200, 30, new ComponentListener() {
+			
+			public void componentActivated(AbstractComponent arg0) {
+				System.out.println(tf.getText());
+			}
+		});
+		tf.setAcceptingInput(true);
+		tf.setBackgroundColor(Color.white);
+		tf.setBorderColor(Color.white);
+		tf.setTextColor(Color.black);
+		tf.setCursorVisible(true);
+	}
+
+	public void render(GameContainer gc, StateBasedGame sbg, Graphics g) throws SlickException {
+		
+		//g.setBackground(Color.lightGray);
+		g.drawString("Please select the number of players", 100, 100);
+		
+		for (NumberOfPlayersButton button : buttons) {
+			g.setColor(Color.blue);
+			g.fillRect(button.getPosX(), button.getPosY(), button.getWidth(), button.getHeight());
+			g.setColor(Color.white);
+			g.drawString(button.getLabel(), button.getPosX(), button.getPosY());
+		}
+		
+		
+		if (players) {
+			//Textfield tf = new Textfield();
+			tf.render(gc, g);
+		}
+	}
+
+	public void update(GameContainer gc, StateBasedGame sbg, int delta) throws SlickException {
+		
+		Input input = gc.getInput();
+		
+		
+		double mouseX = Mouse.getX();
+		double mouseY = Mouse.getY();
+
+		if (input.isMousePressed(0)) {
+		
+			for (NumberOfPlayersButton button : buttons) {
+				
+				if (mouseX > button.getPosX() && mouseX < (button.getPosX()+button.getWidth()) &&
+						mouseY > (600 - button.getPosY() - button.getHeight()) && mouseY < (600 - button.getPosY())) {
+					
+					
+					System.out.println("clique sur "+button.getLabel());
+					nbOfPlayers = Integer.valueOf(button.getLabel());
+					players = true;
+					
+					//sbg.enterState(2);
+					break;
+				}
+			}
+		}
+		
+		
+	}
+
+	public int getID() {
+		return 1;
+	}
+}
+
+
+// classe DomiNationUIPlay
+
+package DomiNation;
+
+//import org.lwjgl.input.Mouse;
+import org.newdawn.slick.*;
+import org.newdawn.slick.state.*;
+
+public class DomiNationUIPlay extends BasicGameState {
+	
+	public DomiNationUIPlay(int state) {
+		
+	}
+	
+
+	public void init(GameContainer gc, StateBasedGame sbg) throws SlickException {
+		
+	}
+
+	public void render(GameContainer gc, StateBasedGame sbg, Graphics g) throws SlickException {
+		g.drawString("Start playing !", 100, 200);
+	}
+
+	public void update(GameContainer gc, StateBasedGame sbg, int delta) throws SlickException {
+		
+	}
+
+	public int getID() {
+		return 2;
+	}
+}
+
