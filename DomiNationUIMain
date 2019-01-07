@@ -1,0 +1,41 @@
+package DomiNation;
+
+import org.newdawn.slick.*;
+import org.newdawn.slick.state.*;
+
+public class DomiNationUIMain extends StateBasedGame {
+
+	public static final String gameName = "DomiNation";
+	public static final int menu = 0;
+	public static final int choosePlayers = 1;
+	public static final int play = 2;
+	
+	public DomiNationUIMain(String gamename) {
+		super(gamename);
+		this.addState(new DomiNationUI(menu));
+		this.addState(new DomiNationUIChoosePlayers(choosePlayers));
+		this.addState(new DomiNationUIPlay(play));
+	}
+	
+	public void initStatesList(GameContainer gc) throws SlickException {
+		this.getState(menu).init(gc, this);
+		this.getState(choosePlayers).init(gc, this);
+		this.getState(play).init(gc, this);
+		this.enterState(menu);
+	}
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+
+		AppGameContainer appGC;
+		try {
+			appGC = new AppGameContainer(new DomiNationUIMain(gameName));
+			appGC.setDisplayMode(800, 600, false);
+			appGC.start();
+			
+		} catch(SlickException e) {
+			e.printStackTrace();
+			
+		}
+	}
+}
